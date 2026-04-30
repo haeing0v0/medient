@@ -5,7 +5,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 <mapper namespace="org.medient.mapper.UserMapper">
 	
-	<insert id="insertUser" parameterType="org.medient.dto.UserDTO">
+	<insert id="insertUser" parameterType="org.medient.dto.user.UserDTO">
 		<![CDATA[
 			INSERT INTO
 				users(user_id, password, user_name, age, gender, is_pregnant)
@@ -14,7 +14,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		]]>
 	</insert>
 	
-	<select id="loginUser" parameterType="org.medient.dto.UserDTO" resultType="org.medient.dto.UserDTO">
+	<select id="loginUser" parameterType="org.medient.dto.user.UserDTO" resultType="org.medient.dto.user.UserDTO">
 		<![CDATA[
 			SELECT
 				id, user_id AS userId, password, user_name AS userName, age, gender, is_pregnant AS isPregnant
