@@ -98,8 +98,6 @@ public class DrugService {
                 .build(true)
                 .toUriString();
 
-        System.out.println("URL: " + fullUrl);
-
         return restClient.get()
                 .uri(URI.create(fullUrl))
                 .retrieve()

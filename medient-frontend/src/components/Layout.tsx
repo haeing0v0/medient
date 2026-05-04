@@ -1,0 +1,73 @@
+import { NavLink, Outlet, Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import "../styles/Layout.css";
+
+interface LoginUser {
+  userNo: number;
+  userId: string;
+  userName: string;
+  age: number;
+  gender: string;
+  isPregnant: boolean;
+}
+
+function Layout() {
+  const navigate = useNavigate();
+  const [loginUser, setLoginUser] = useState<LoginUser | null>(null);
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem("loginUser");
+
+    if (savedUser) {
+      setLoginUser(JSON.parse(savedUser));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("loginUser");
+    setLoginUser(null);
+    alert("로그아웃 되었습니다.");
+    navigate("/");
+  };
+
+  return (
+    <div className="app-layout">
+      <header className="navbar">
+        <Link to="/" className="navbar-logo">
+          <span className="logo-icon">💊</span>
+          <span>Medient</span>
+        </Link>
+
+        <nav className="navbar-menu">
+          <NavLink to="/">홈</NavLink>
+          <NavLink to="/drugs">약검색</NavLink>
+          <NavLink to="/my-drugs">내복용약</NavLink>
+          <NavLink to="/dur-check">안전체크</NavLink>
+          <NavLink to="/stats">통계</NavLink>
+        </nav>
+
+        <div className="navbar-auth">
+          {loginUser && (
+            <span className="login-user-name">{loginUser.userName}님</span>
+          )}
+
+          {loginUser ? (
+            <button className="navbar-login" onClick={handleLogout}>
+              로그아웃
+            </button>
+          ) : (
+            <Link to="/login" className="navbar-login">
+              로그인
+            </Link>
+          )}
+        </div>
+      </header>
+
+      <main className="layout-content">
+        <Outlet />
+      </main>
+    </div>
+  );
+}
+
+export default Layout;

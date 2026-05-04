@@ -16,7 +16,7 @@ public class UserService {
     public void signup(UserDTO user) {
         userMapper.insertUser(user);
     }
-    
+
     public LoginResponseDTO loginUser(UserDTO user) {
         UserDTO result = userMapper.loginUser(user);
 
@@ -25,7 +25,7 @@ public class UserService {
         }
 
         LoginResponseDTO response = new LoginResponseDTO();
-        response.setId(result.getId());
+        response.setUserNo(result.getUserNo());
         response.setUserId(result.getUserId());
         response.setUserName(result.getUserName());
         response.setAge(result.getAge());

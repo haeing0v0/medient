@@ -17,7 +17,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<select id="loginUser" parameterType="org.medient.dto.user.UserDTO" resultType="org.medient.dto.user.UserDTO">
 		<![CDATA[
 			SELECT
-				id, user_id AS userId, password, user_name AS userName, age, gender, is_pregnant AS isPregnant
+				user_no AS userNo, user_id AS userId, password, user_name AS userName, age, gender, is_pregnant AS isPregnant
 			FROM
 				users
 			WHERE
