@@ -6,7 +6,8 @@ import DrugDetail from "./page/drug/DrugDetail";
 import Login from "./page/member/Login";
 import Join from "./page/member/Join";
 import DurCheck from "./page/dur/DurCheck";
-// import MyDrugList from "./page/mydrug/MyDrugList";
+import MyMedicine from "./page/medicine/MyMedicine";
+import AddMedicine from "./page/medicine/AddMedicine";
 // import Stats from "./page/stats/Stats";
 
 function App() {
@@ -20,8 +21,10 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/join" element={<Join />} />
           <Route path="/dur-check" element={<DurCheck />} />
-          {/* <Route path="/my-drugs" element={<MyDrugList />} />
-          <Route path="/stats" element={<Stats />} /> */}
+          <Route path="/my-medicine" element={<MyMedicine />} />
+          <Route path="/my-medicine/add" element={<AddMedicine />} />
+          <Route path="/my-medicine/edit/:id" element={<AddMedicine />} />
+          {/* <Route path="/stats" element={<Stats />} /> */}
         </Route>
       </Routes>
     </BrowserRouter>

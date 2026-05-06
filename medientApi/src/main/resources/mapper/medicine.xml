@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.medient.mapper.MedicineMapper">
+
+    <select id="findByUserId" resultType="org.medient.dto.medicine.MedicineResponseDTO">
+        SELECT
+            id,
+            user_id AS userId,
+            item_seq AS itemSeq,
+            item_name AS itemName,
+            DATE_FORMAT(start_date, '%Y-%m-%d') AS startDate,
+            DATE_FORMAT(end_date, '%Y-%m-%d') AS endDate,
+            daily_count AS dailyCount,
+            dose_time AS doseTime,
+            status,
+            memo,
+            DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt
+        FROM user_medicine
+        WHERE user_id = #{userId}
+        ORDER BY id DESC
+    </select>
+
+    <select id="findTodayByUserId" resultType="org.medient.dto.medicine.MedicineResponseDTO">
+        SELECT
+            id,
+            user_id AS userId,
+            item_seq AS itemSeq,
+            item_name AS itemName,
+            DATE_FORMAT(start_date, '%Y-%m-%d') AS startDate,
+            DATE_FORMAT(end_date, '%Y-%m-%d') AS endDate,
+            daily_count AS dailyCount,
+            dose_time AS doseTime,
+            status,
+            memo,
+            DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt
+        FROM user_medicine
+        WHERE user_id = #{userId}
+          AND CURDATE() BETWEEN start_date AND end_date
+          AND status != '중단'
+        ORDER BY id DESC
+    </select>
+
+    <insert id="insertMedicine">
+        INSERT INTO user_medicine (
+            user_id,
+            item_seq,
+            item_name,
+            start_date,
+            end_date,
+            daily_count,
+            dose_time,
+            status,
+            memo
+        )
+        VALUES (
+            #{userId},
+            #{itemSeq},
+            #{itemName},
+            #{startDate},
+            #{endDate},
+            #{dailyCount},
+            #{doseTime},
+            #{status},
+            #{memo}
+        )
+    </insert>
+
+    <update id="updateTaken">
+        UPDATE user_medicine
+        SET status = '복용완료'
+        WHERE id = #{id}
+          AND user_id = #{userId}
+    </update>
+
+    <delete id="deleteMedicine">
+        DELETE FROM user_medicine
+        WHERE id = #{id}
+          AND user_id = #{userId}
+    </delete>
+
+</mapper>

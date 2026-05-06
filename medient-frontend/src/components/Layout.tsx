@@ -41,7 +41,7 @@ function Layout() {
         <nav className="navbar-menu">
           <NavLink to="/">홈</NavLink>
           <NavLink to="/drugs">약검색</NavLink>
-          <NavLink to="/my-drugs">내복용약</NavLink>
+          <NavLink to="/my-medicine">내복용약</NavLink>
           <NavLink to="/dur-check">안전체크</NavLink>
           <NavLink to="/stats">통계</NavLink>
         </nav>

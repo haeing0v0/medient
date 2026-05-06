@@ -1,0 +1,246 @@
+.my-med-page {
+  min-height: calc(100vh - 90px);
+  padding: 0px 80px 80px;
+  background: #f3fbfc;
+}
+
+.my-med-title {
+  margin-bottom: 24px;
+  font-size: 32px;
+  font-weight: 800;
+  color: #0f1f3d;
+}
+
+.summary-card {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-bottom: 36px;
+  padding: 32px 48px;
+  background: #ffffff;
+  border: 1px solid #d7e8f0;
+  border-radius: 24px;
+}
+
+.summary-card div {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.summary-card span {
+  font-size: 15px;
+  color: #6b7a90;
+  font-weight: 700;
+}
+
+.summary-card strong {
+  font-size: 34px;
+  color: #0b7fc3;
+}
+
+.summary-card .orange {
+  color: #ff9f1c;
+}
+
+.medicine-section {
+  margin-top: 34px;
+}
+
+.medicine-section h2 {
+  margin-bottom: 14px;
+  font-size: 24px;
+  color: #0f1f3d;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.add-med-btn {
+  font-size: 14px;
+  padding: 3px 16px;
+  border-radius: 999px;
+  background: #0b7fc3;
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.medicine-table-card {
+  overflow: hidden;
+  background: white;
+  border: 1px solid #d7e8f0;
+  border-radius: 20px;
+}
+
+.medicine-table-card table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.medicine-table-card th,
+.medicine-table-card td {
+  padding: 18px 28px;
+  text-align: left;
+  font-size: 15px;
+}
+
+.medicine-table-card th {
+  color: #6b7a90;
+  font-weight: 800;
+}
+
+.medicine-table-card td {
+  color: #0f1f3d;
+  font-weight: 700;
+}
+
+.empty-table {
+  padding: 36px !important;
+  text-align: center !important;
+  color: #7a8ca5 !important;
+}
+
+.taken-btn {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #cfd8e3;
+  border-radius: 50%;
+  background: white;
+  color: #cfd8e3;
+  cursor: pointer;
+}
+
+.taken-btn.done {
+  background: #10a66a;
+  border-color: #10a66a;
+  color: white;
+  cursor: default;
+}
+
+.orange {
+  background: none;
+}
+
+.edit-med-btn {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #eef8fc;
+  color: #0b7fc3;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.edit-med-btn:hover {
+  background: #dff1fa;
+}
+
+.manage-btn-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.delete-med-btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 999px;
+  background: #fff0f0;
+  color: #ff3b3b;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.delete-med-btn:hover {
+  background: #ffe1e1;
+}
+
+.caution-summary {
+  position: relative;
+}
+
+.caution-hover-area {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.caution-popover {
+  display: none !important;
+  position: absolute;
+  top: 50px;
+  left: 10%;
+  transform: translateX(-50%);
+  z-index: 100;
+  width: 300px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1px solid #ffd59a;
+  border-radius: 18px;
+  box-shadow: 0 14px 30px rgba(15, 31, 61, 0.14);
+}
+
+.caution-hover-area:hover .caution-popover {
+  display: block !important;
+}
+
+.caution-popover::before {
+  content: "";
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  background: #ffffff;
+  border-left: 1px solid #ffd59a;
+  border-top: 1px solid #ffd59a;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.caution-popover-title {
+  display: block;
+  margin-bottom: 8px;
+  color: #ff9f1c;
+  font-size: 18px;
+}
+
+.caution-popover p {
+  margin: 0 0 8px;
+  color: #0f1f3d;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.caution-popover p:last-child {
+  margin-bottom: 0;
+}
+
+.summary-card .caution-popover strong {
+  font-size: 22px;
+  color: #0b7fc3;
+}
+
+@media (max-width: 900px) {
+  .my-med-page {
+    padding: 28px 20px;
+  }
+
+  .summary-card {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    padding: 28px;
+  }
+
+  .medicine-table-card {
+    overflow-x: auto;
+  }
+
+  .medicine-table-card table {
+    min-width: 900px;
+  }
+}
