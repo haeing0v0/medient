@@ -66,6 +66,15 @@ function Layout() {
       <main className="layout-content">
         <Outlet />
       </main>
+
+      <footer className="global-footer">
+        <div>
+          <h3>💊 Medient</h3>
+          <p>DUR 공공데이터 기반 개인 맞춤 복약 안전 관리 서비스</p>
+        </div>
+
+        <p className="footer-copy">© 2026 Medient. All rights reserved.</p>
+      </footer>
     </div>
   );
 }

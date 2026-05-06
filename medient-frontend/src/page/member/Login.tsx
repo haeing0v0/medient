@@ -16,9 +16,9 @@ function Login() {
       const data = await login({ userId, password });
 
       localStorage.setItem("loginUser", JSON.stringify(data));
-      window.location.href = "/";
 
       alert("로그인 성공");
+      navigate("/");
     } catch (error) {
       console.error(error);
       alert("아이디 또는 비밀번호를 확인해주세요.");

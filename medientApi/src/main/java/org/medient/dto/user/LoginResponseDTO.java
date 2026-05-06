@@ -10,4 +10,6 @@ public class LoginResponseDTO {
     private Integer age;
     private String gender;
     private Boolean isPregnant;
+
+    private String token;
 }

@@ -3,6 +3,7 @@ package org.medient.controller;
 import org.medient.dto.user.LoginResponseDTO;
 import org.medient.dto.user.UserDTO;
 import org.medient.service.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
@@ -22,8 +23,14 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public LoginResponseDTO login(@RequestBody UserDTO userDTO) {
-        return userService.loginUser(userDTO);
+    public ResponseEntity<?> login(@RequestBody UserDTO userDTO) {
+        LoginResponseDTO response = userService.loginUser(userDTO);
+
+        if (response == null) {
+            return ResponseEntity.status(401).body("아이디 또는 비밀번호가 올바르지 않습니다.");
+        }
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/logout")

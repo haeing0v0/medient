@@ -5,6 +5,7 @@ import org.medient.dto.user.UserDTO;
 
 @Mapper
 public interface UserMapper {
-	void insertUser(UserDTO user);
-	UserDTO loginUser(UserDTO user);
+    void insertUser(UserDTO user);
+
+    UserDTO findByUserId(String userId);
 }

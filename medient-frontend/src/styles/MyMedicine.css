@@ -225,6 +225,58 @@
   color: #0b7fc3;
 }
 
+.login-required-box {
+  width: 100%;
+  max-width: 520px;
+
+  margin: 120px auto;
+
+  padding: 60px 40px;
+
+  background: white;
+  border: 1px solid #d8e9ef;
+  border-radius: 28px;
+
+  text-align: center;
+}
+
+.login-required-box h2 {
+  margin-bottom: 16px;
+
+  color: #0f172a;
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.login-required-box p {
+  margin-bottom: 32px;
+
+  color: #6b7b90;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.login-move-btn {
+  border: none;
+  border-radius: 14px;
+
+  padding: 14px 28px;
+
+  background: #0878bd;
+  color: white;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.login-move-btn:hover {
+  background: #0667a3;
+}
+
 @media (max-width: 900px) {
   .my-med-page {
     padding: 28px 20px;

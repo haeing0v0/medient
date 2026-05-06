@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   completeMedicine,
   deleteMedicine,
@@ -17,6 +18,8 @@ function MyMedicine() {
   const [checkingDur, setCheckingDur] = useState(false);
   const [cautionCount, setCautionCount] = useState(0);
   const [cautionDetails, setCautionDetails] = useState<string[]>([]);
+  const navigate = useNavigate();
+  const [needLogin, setNeedLogin] = useState(false);
 
   const fetchMedicines = async () => {
     try {
@@ -32,8 +35,12 @@ function MyMedicine() {
 
       await checkTodayDur(todayData);
     } catch (error) {
+      if (error.response?.status === 401) {
+        setNeedLogin(true);
+        return;
+      }
+
       console.error(error);
-      alert("복용약 정보를 불러오지 못했습니다.");
     } finally {
       setLoading(false);
     }
@@ -150,6 +157,22 @@ function MyMedicine() {
   const missedCount = todayMedicines.filter(
     (medicine) => getTodayStatus(medicine) === "복용전",
   ).length;
+
+  if (needLogin) {
+    return (
+      <main className="my-medicine-page">
+        <section className="login-required-box">
+          <h2>로그인 후 이용할 수 있습니다</h2>
+
+          <p>내 복용약 관리 기능은 회원 전용 서비스입니다.</p>
+
+          <button className="login-move-btn" onClick={() => navigate("/login")}>
+            로그인하러 가기
+          </button>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main className="my-med-page">

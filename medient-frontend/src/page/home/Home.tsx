@@ -245,14 +245,6 @@ function Home() {
           ※ 본 서비스는 의학적 진단이 아닌 참고 정보를 제공합니다.
         </p>
       </section>
-
-      <footer className="home-footer reveal-section">
-        <div>
-          <h3>💊 Medient</h3>
-          <p>DUR 공공데이터 기반 개인 맞춤 복약 안전 관리 서비스</p>
-        </div>
-        <p className="footer-copy">© 2026 Medient. All rights reserved.</p>
-      </footer>
     </div>
   );
 }

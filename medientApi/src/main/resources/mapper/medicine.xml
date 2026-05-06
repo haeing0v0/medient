@@ -80,5 +80,37 @@
         WHERE id = #{id}
           AND user_id = #{userId}
     </delete>
-
+    
+    <select id="findById" resultType="org.medient.dto.medicine.MedicineResponseDTO">
+    SELECT
+        id,
+        user_id AS userId,
+        item_seq AS itemSeq,
+        item_name AS itemName,
+        DATE_FORMAT(start_date, '%Y-%m-%d') AS startDate,
+        DATE_FORMAT(end_date, '%Y-%m-%d') AS endDate,
+        daily_count AS dailyCount,
+        dose_time AS doseTime,
+        status,
+        memo,
+        DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt
+	    FROM user_medicine
+	    WHERE id = #{id}
+	      AND user_id = #{userId}
+	</select>
+	
+	<update id="updateMedicine">
+	    UPDATE user_medicine
+	    SET
+	        item_seq = #{dto.itemSeq},
+	        item_name = #{dto.itemName},
+	        start_date = #{dto.startDate},
+	        end_date = #{dto.endDate},
+	        daily_count = #{dto.dailyCount},
+	        dose_time = #{dto.doseTime},
+	        status = #{dto.status},
+	        memo = #{dto.memo}
+	    WHERE id = #{id}
+	      AND user_id = #{dto.userId}
+	</update>
 </mapper>
