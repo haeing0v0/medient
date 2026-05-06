@@ -32,6 +32,7 @@ dependencies {
 	testAnnotationProcessor 'org.projectlombok:lombok'
 	implementation("org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16")
 	implementation("org.springframework.boot:spring-boot-starter-security")
+	implementation 'org.json:json:20240303'
 }
 
 tasks.named('test') {
