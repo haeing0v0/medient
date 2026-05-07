@@ -1,0 +1,43 @@
+.login-required-box {
+  width: 100%;
+  max-width: 520px;
+  margin: 120px auto;
+  padding: 56px 40px;
+  background: #ffffff;
+  border: 1px solid #d8e9ef;
+  border-radius: 28px;
+  text-align: center;
+}
+
+.login-required-box h2 {
+  margin-bottom: 14px;
+  color: #0f1f3d;
+  font-size: 30px;
+  font-weight: 900;
+}
+
+.login-required-box p {
+  margin-bottom: 30px;
+  color: #6b7b90;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.login-move-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 999px;
+  padding: 14px 28px;
+  background: #0878bd;
+  color: white;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.login-move-btn:hover {
+  background: #0667a3;
+}

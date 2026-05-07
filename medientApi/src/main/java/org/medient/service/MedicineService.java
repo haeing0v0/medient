@@ -41,6 +41,7 @@ public class MedicineService {
 
     public void completeMedicine(Long id, Long userId) {
         medicineMapper.updateTaken(id, userId);
+        medicineMapper.insertMedicineLog(id, userId);
     }
 
     public void deleteMedicine(Long id, Long userId) {

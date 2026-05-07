@@ -43,7 +43,7 @@ function Layout() {
           <NavLink to="/drugs">약검색</NavLink>
           <NavLink to="/my-medicine">내복용약</NavLink>
           <NavLink to="/dur-check">안전체크</NavLink>
-          <NavLink to="/stats">통계</NavLink>
+          <NavLink to="/statistics">통계</NavLink>
         </nav>
 
         <div className="navbar-auth">

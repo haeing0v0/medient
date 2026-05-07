@@ -8,7 +8,7 @@ import Join from "./page/member/Join";
 import DurCheck from "./page/dur/DurCheck";
 import MyMedicine from "./page/medicine/MyMedicine";
 import AddMedicine from "./page/medicine/AddMedicine";
-// import Stats from "./page/stats/Stats";
+import Statistics from "./page/statistics/Statistics";
 
 function App() {
   return (
@@ -24,7 +24,7 @@ function App() {
           <Route path="/my-medicine" element={<MyMedicine />} />
           <Route path="/my-medicine/add" element={<AddMedicine />} />
           <Route path="/my-medicine/edit/:id" element={<AddMedicine />} />
-          {/* <Route path="/stats" element={<Stats />} /> */}
+          <Route path="/statistics" element={<Statistics />} />
         </Route>
       </Routes>
     </BrowserRouter>

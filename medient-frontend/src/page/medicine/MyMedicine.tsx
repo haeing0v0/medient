@@ -10,6 +10,7 @@ import {
 import { checkDur } from "../../api/durApi";
 import type { Medicine } from "../../types/Medicine";
 import "../../styles/MyMedicine.css";
+import LoginRequiredCard from "../../components/LoginRequiredCard";
 
 function MyMedicine() {
   const [medicines, setMedicines] = useState<Medicine[]>([]);
@@ -161,15 +162,7 @@ function MyMedicine() {
   if (needLogin) {
     return (
       <main className="my-medicine-page">
-        <section className="login-required-box">
-          <h2>로그인 후 이용할 수 있습니다</h2>
-
-          <p>내 복용약 관리 기능은 회원 전용 서비스입니다.</p>
-
-          <button className="login-move-btn" onClick={() => navigate("/login")}>
-            로그인하러 가기
-          </button>
-        </section>
+        <LoginRequiredCard description="내 복용약 관리 기능은 회원 전용 서비스입니다." />
       </main>
     );
   }

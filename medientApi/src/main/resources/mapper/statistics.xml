@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.medient.mapper.StatisticsMapper">
+
+    <select id="countWeeklyTotal" resultType="int">
+        SELECT COUNT(*)
+        FROM user_medicine
+        WHERE user_id = #{userId}
+          AND status != '중단'
+          AND start_date &lt;= CURDATE()
+          AND end_date >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+    </select>
+
+    <select id="countWeeklyTaken" resultType="int">
+        SELECT COUNT(DISTINCT medicine_id)
+        FROM medicine_log
+        WHERE user_id = #{userId}
+          AND taken_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 6 DAY) AND CURDATE()
+          AND status = '복용완료'
+    </select>
+
+    <select id="countMonthlyTotal" resultType="int">
+        SELECT COUNT(*)
+        FROM user_medicine
+        WHERE user_id = #{userId}
+          AND status != '중단'
+          AND start_date &lt;= CURDATE()
+          AND end_date >= DATE_SUB(CURDATE(), INTERVAL 29 DAY)
+    </select>
+
+    <select id="countMonthlyTaken" resultType="int">
+        SELECT COUNT(DISTINCT medicine_id)
+        FROM medicine_log
+        WHERE user_id = #{userId}
+          AND taken_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 29 DAY) AND CURDATE()
+          AND status = '복용완료'
+    </select>
+
+    <select id="countTotalByDate" resultType="int">
+        SELECT COUNT(*)
+        FROM user_medicine
+        WHERE user_id = #{userId}
+          AND status != '중단'
+          AND #{date} BETWEEN start_date AND end_date
+    </select>
+
+    <select id="countTakenByDate" resultType="int">
+        SELECT COUNT(DISTINCT medicine_id)
+        FROM medicine_log
+        WHERE user_id = #{userId}
+          AND taken_date = #{date}
+          AND status = '복용완료'
+    </select>
+
+    <select id="findActiveMedicines" resultType="org.medient.dto.medicine.MedicineResponseDTO">
+        SELECT
+            id,
+            user_id AS userId,
+            item_seq AS itemSeq,
+            item_name AS itemName,
+            DATE_FORMAT(start_date, '%Y-%m-%d') AS startDate,
+            DATE_FORMAT(end_date, '%Y-%m-%d') AS endDate,
+            daily_count AS dailyCount,
+            dose_time AS doseTime,
+            status,
+            memo,
+            DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt
+        FROM user_medicine
+        WHERE user_id = #{userId}
+          AND status != '중단'
+          AND CURDATE() BETWEEN start_date AND end_date
+    </select>
+
+</mapper>

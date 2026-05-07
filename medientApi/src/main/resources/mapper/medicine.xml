@@ -113,4 +113,19 @@
 	    WHERE id = #{id}
 	      AND user_id = #{dto.userId}
 	</update>
+	
+	<insert id="insertMedicineLog">
+	    INSERT INTO medicine_log (
+	        user_id,
+	        medicine_id,
+	        taken_date,
+	        status
+	    )
+	    VALUES (
+	        #{userId},
+	        #{id},
+	        CURDATE(),
+	        '복용완료'
+	    )
+	</insert>
 </mapper>
