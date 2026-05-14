@@ -23,6 +23,8 @@ public interface MedicineMapper {
     void updateTaken(@Param("id") Long id, @Param("userId") Long userId);
 
     void deleteMedicine(@Param("id") Long id, @Param("userId") Long userId);
-    
+
     void insertMedicineLog(@Param("id") Long id, @Param("userId") Long userId);
+
+    List<MedicineResponseDTO> findActiveMedicinesForDur(@Param("userId") Long userId);
 }

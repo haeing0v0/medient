@@ -128,4 +128,25 @@
 	        '복용완료'
 	    )
 	</insert>
+	
+	<select id="findActiveMedicinesForDur"
+	        resultType="org.medient.dto.medicine.MedicineResponseDTO">
+	    SELECT
+	        id,
+	        user_id AS userId,
+	        item_seq AS itemSeq,
+	        item_name AS itemName,
+	        DATE_FORMAT(start_date, '%Y-%m-%d') AS startDate,
+	        DATE_FORMAT(end_date, '%Y-%m-%d') AS endDate,
+	        daily_count AS dailyCount,
+	        dose_time AS doseTime,
+	        status,
+	        memo,
+	        DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt
+	    FROM user_medicine
+	    WHERE user_id = #{userId}
+	      AND status != '중단'
+	      AND CURDATE() BETWEEN start_date AND end_date
+	    ORDER BY id DESC
+	</select>
 </mapper>

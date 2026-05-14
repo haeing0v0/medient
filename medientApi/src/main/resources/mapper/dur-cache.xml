@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.medient.mapper.DurCacheMapper">
+
+    <delete id="deleteByUserId">
+        DELETE FROM dur_check_cache
+        WHERE user_id = #{userId}
+    </delete>
+
+    <insert id="insertCache">
+        INSERT INTO dur_check_cache (
+            user_id,
+            drug1_name,
+            drug2_name,
+            warning_type,
+            message,
+            danger
+        )
+        VALUES (
+            #{userId},
+            #{drug1Name},
+            #{drug2Name},
+            #{warningType},
+            #{message},
+            #{danger}
+        )
+        ON DUPLICATE KEY UPDATE
+            message = VALUES(message),
+            danger = VALUES(danger),
+            updated_at = CURRENT_TIMESTAMP
+    </insert>
+
+    <select id="findByUserId" resultType="org.medient.dto.dur.DurCacheDTO">
+        SELECT
+            id,
+            user_id AS userId,
+            drug1_name AS drug1Name,
+            drug2_name AS drug2Name,
+            warning_type AS warningType,
+            message,
+            danger,
+            DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt,
+            DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i:%s') AS updatedAt
+        FROM dur_check_cache
+        WHERE user_id = #{userId}
+        ORDER BY updated_at DESC
+    </select>
+
+</mapper>

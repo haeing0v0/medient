@@ -6,10 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.medient.dto.dur.DurCheckResponseDTO;
-import org.medient.dto.dur.DurWarningDTO;
-import org.medient.dto.medicine.MedicineResponseDTO;
+import org.medient.dto.dur.DurCacheDTO;
 import org.medient.dto.statistics.StatisticsResponseDTO;
+import org.medient.mapper.DurCacheMapper;
 import org.medient.mapper.StatisticsMapper;
 import org.springframework.stereotype.Service;
 
@@ -20,18 +19,18 @@ import lombok.RequiredArgsConstructor;
 public class StatisticsService {
 
     private final StatisticsMapper statisticsMapper;
-    private final DurService durService;
+    private final DurCacheMapper durCacheMapper;
 
     public StatisticsResponseDTO getStatistics(Long userId) {
 
-    	List<StatisticsResponseDTO.RateItem> weeklyGraph =
-    	        createWeeklyGraph(userId);
+        List<StatisticsResponseDTO.RateItem> weeklyGraph =
+                createWeeklyGraph(userId);
 
-    	List<StatisticsResponseDTO.RateItem> monthlyGraph =
-    	        createMonthlyGraph(userId);
+        List<StatisticsResponseDTO.RateItem> monthlyGraph =
+                createMonthlyGraph(userId);
 
-    	int weeklyRate = calculateAverageRate(weeklyGraph);
-    	int monthlyRate = calculateAverageRate(monthlyGraph);
+        int weeklyRate = calculateAverageRate(weeklyGraph);
+        int monthlyRate = calculateAverageRate(monthlyGraph);
 
         List<StatisticsResponseDTO.CalendarItem> calendarItems =
                 createCalendarItems(userId);
@@ -68,7 +67,7 @@ public class StatisticsService {
 
         return (int) Math.round((taken * 100.0) / total);
     }
-    
+
     private int calculateAverageRate(List<StatisticsResponseDTO.RateItem> graph) {
         int sum = 0;
         int count = 0;
@@ -108,11 +107,6 @@ public class StatisticsService {
                             .rate(rate)
                             .build()
             );
-            
-            System.out.println(date);
-            System.out.println("전체 약: " + total);
-            System.out.println("복용 약: " + taken);
-            System.out.println("복용률: " + rate);
         }
 
         return list;
@@ -197,56 +191,22 @@ public class StatisticsService {
 
     private List<StatisticsResponseDTO.DangerItem> createDangerItems(Long userId) {
         List<StatisticsResponseDTO.DangerItem> dangerItems = new ArrayList<>();
-        List<String> addedKeys = new ArrayList<>();
 
-        List<MedicineResponseDTO> activeMedicines =
-                statisticsMapper.findActiveMedicines(userId);
+        List<DurCacheDTO> caches = durCacheMapper.findByUserId(userId);
 
-        for (int i = 0; i < activeMedicines.size(); i++) {
-            for (int j = i + 1; j < activeMedicines.size(); j++) {
-
-                MedicineResponseDTO drug1 = activeMedicines.get(i);
-                MedicineResponseDTO drug2 = activeMedicines.get(j);
-
-                DurCheckResponseDTO result1 =
-                        durService.checkDur(drug1.getItemName(), drug2.getItemName());
-
-                DurCheckResponseDTO result2 =
-                        durService.checkDur(drug2.getItemName(), drug1.getItemName());
-
-                List<DurWarningDTO> warnings = new ArrayList<>();
-                warnings.addAll(result1.getWarnings());
-                warnings.addAll(result2.getWarnings());
-
-                for (DurWarningDTO warning : warnings) {
-                    if (warning.isDanger()) {
-
-                        String key =
-                                drug1.getItemName()
-                                        + "|"
-                                        + drug2.getItemName()
-                                        + "|"
-                                        + warning.getType()
-                                        + "|"
-                                        + warning.getMessage();
-
-                        if (addedKeys.contains(key)) {
-                            continue;
-                        }
-
-                        addedKeys.add(key);
-
-                        dangerItems.add(
-                                StatisticsResponseDTO.DangerItem.builder()
-                                        .drug1(drug1.getItemName())
-                                        .drug2(drug2.getItemName())
-                                        .type(warning.getType())
-                                        .message(warning.getMessage())
-                                        .build()
-                        );
-                    }
-                }
+        for (DurCacheDTO cache : caches) {
+            if (!Boolean.TRUE.equals(cache.getDanger())) {
+                continue;
             }
+
+            dangerItems.add(
+                    StatisticsResponseDTO.DangerItem.builder()
+                            .drug1(cache.getDrug1Name())
+                            .drug2(cache.getDrug2Name())
+                            .type(cache.getWarningType())
+                            .message(cache.getMessage())
+                            .build()
+            );
         }
 
         return dangerItems;

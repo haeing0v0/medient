@@ -87,29 +87,50 @@ public class DurService {
             String drug2,
             List<DurWarningDTO> warnings
     ) {
-        JSONArray items = requestDurApi("/getEfcyDplctInfoList03", drug1);
+        JSONArray items1 = requestDurApi(
+                "/getEfcyDplctInfoList03",
+                drug1
+        );
+
+        JSONArray items2 = requestDurApi(
+                "/getEfcyDplctInfoList03",
+                drug2
+        );
 
         boolean found = false;
         String message = "효능군중복 해당 없음";
 
-        for (int i = 0; i < items.length(); i++) {
-            JSONObject item = items.getJSONObject(i);
+        List<String> typeList1 = new ArrayList<>();
+        List<String> typeList2 = new ArrayList<>();
 
-            String mixtureItemName = item.optString("MIXTURE_ITEM_NAME");
-            String mixtureIngrName = item.optString("MIXTURE_INGR_KOR_NAME");
-            String durType = item.optString("TYPE_NAME");
+        for (int i = 0; i < items1.length(); i++) {
+            JSONObject item = items1.getJSONObject(i);
+            String typeName = item.optString("TYPE_NAME");
 
-            if (containsText(mixtureItemName, drug2)
-                    || containsText(mixtureIngrName, drug2)
-                    || containsText(drug2, mixtureIngrName)) {
+            if (!typeName.isBlank()) {
+                typeList1.add(typeName.trim());
+            }
+        }
 
-                found = true;
-                message = "두 약물은 효능군이 중복될 수 있습니다.";
+        for (int i = 0; i < items2.length(); i++) {
+            JSONObject item = items2.getJSONObject(i);
+            String typeName = item.optString("TYPE_NAME");
 
-                if (!durType.isBlank()) {
-                    message += " 유형: " + durType;
+            if (!typeName.isBlank()) {
+                typeList2.add(typeName.trim());
+            }
+        }
+
+        for (String type1 : typeList1) {
+            for (String type2 : typeList2) {
+                if (type1.equalsIgnoreCase(type2)) {
+                    found = true;
+                    message = "두 약물은 동일 효능군(" + type1 + ")으로 중복될 수 있습니다.";
+                    break;
                 }
+            }
 
+            if (found) {
                 break;
             }
         }
