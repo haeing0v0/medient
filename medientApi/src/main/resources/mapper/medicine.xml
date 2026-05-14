@@ -24,24 +24,35 @@
     </select>
 
     <select id="findTodayByUserId" resultType="org.medient.dto.medicine.MedicineResponseDTO">
-        SELECT
-            id,
-            user_id AS userId,
-            item_seq AS itemSeq,
-            item_name AS itemName,
-            DATE_FORMAT(start_date, '%Y-%m-%d') AS startDate,
-            DATE_FORMAT(end_date, '%Y-%m-%d') AS endDate,
-            daily_count AS dailyCount,
-            dose_time AS doseTime,
-            status,
-            memo,
-            DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt
-        FROM user_medicine
-        WHERE user_id = #{userId}
-          AND CURDATE() BETWEEN start_date AND end_date
-          AND status != '중단'
-        ORDER BY id DESC
-    </select>
+	    SELECT
+	        um.id,
+	        um.user_id AS userId,
+	        um.item_seq AS itemSeq,
+	        um.item_name AS itemName,
+	        DATE_FORMAT(um.start_date, '%Y-%m-%d') AS startDate,
+	        DATE_FORMAT(um.end_date, '%Y-%m-%d') AS endDate,
+	        um.daily_count AS dailyCount,
+	        um.dose_time AS doseTime,
+	        CASE
+	            WHEN ml.medicine_id IS NOT NULL THEN '복용완료'
+	            ELSE '복용전'
+	        END AS status,
+	        um.memo,
+	        DATE_FORMAT(um.created_at, '%Y-%m-%d %H:%i:%s') AS createdAt
+	    FROM user_medicine um
+	    LEFT JOIN (
+	        SELECT DISTINCT user_id, medicine_id
+	        FROM medicine_log
+	        WHERE taken_date = CURDATE()
+	          AND status = '복용완료'
+	    ) ml
+	      ON um.id = ml.medicine_id
+	     AND um.user_id = ml.user_id
+	    WHERE um.user_id = #{userId}
+	      AND CURDATE() BETWEEN um.start_date AND um.end_date
+	      AND um.status != '중단'
+	    ORDER BY um.id DESC
+	</select>
 
     <insert id="insertMedicine">
         INSERT INTO user_medicine (
@@ -67,13 +78,6 @@
             #{memo}
         )
     </insert>
-
-    <update id="updateTaken">
-        UPDATE user_medicine
-        SET status = '복용완료'
-        WHERE id = #{id}
-          AND user_id = #{userId}
-    </update>
 
     <delete id="deleteMedicine">
         DELETE FROM user_medicine

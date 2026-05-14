@@ -29,6 +29,10 @@ public class MedicineService {
     public List<MedicineResponseDTO> getTodayMedicines(Long userId) {
         return medicineMapper.findTodayByUserId(userId);
     }
+    
+    public List<DurCacheDTO> getDurWarnings(Long userId) {
+        return durCacheMapper.findByUserId(userId);
+    }
 
     public MedicineResponseDTO getMedicine(Long id, Long userId) {
         return medicineMapper.findById(id, userId);
@@ -51,7 +55,6 @@ public class MedicineService {
     }
 
     public void completeMedicine(Long id, Long userId) {
-        medicineMapper.updateTaken(id, userId);
         medicineMapper.insertMedicineLog(id, userId);
     }
 

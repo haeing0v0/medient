@@ -1,5 +1,6 @@
 import axiosInstance from "./axios";
 import type { Medicine, MedicineRequest } from "../types/Medicine";
+import type { DurWarningCache } from "../types/Medicine";
 
 export const getMedicines = async () => {
   const res = await axiosInstance.get<Medicine[]>("/medicines");
@@ -42,6 +43,14 @@ export const completeMedicine = async (id: number) => {
 
 export const deleteMedicine = async (id: number) => {
   const res = await axiosInstance.delete(`/medicines/${id}`);
+
+  return res.data;
+};
+
+export const getDurWarnings = async () => {
+  const res = await axiosInstance.get<DurWarningCache[]>(
+    "/medicines/dur-warnings",
+  );
 
   return res.data;
 };

@@ -3,11 +3,22 @@ package org.medient.controller;
 import java.util.List;
 
 import org.medient.config.JwtUtil;
+import org.medient.dto.dur.DurCacheDTO;
 import org.medient.dto.medicine.MedicineRequestDTO;
 import org.medient.dto.medicine.MedicineResponseDTO;
 import org.medient.service.MedicineService;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 
@@ -122,6 +133,16 @@ public class MedicineController {
         medicineService.deleteMedicine(id, userNo);
 
         return "복용약 삭제 완료";
+    }
+    
+    @GetMapping("/dur-warnings")
+    public List<DurCacheDTO> getDurWarnings(
+            @RequestHeader(value = "Authorization", required = false)
+            String authorizationHeader
+    ) {
+        Long userNo = getUserNoFromToken(authorizationHeader);
+
+        return medicineService.getDurWarnings(userNo);
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)

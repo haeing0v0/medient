@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 import {
   completeMedicine,
   deleteMedicine,
+  getDurWarnings,
   getMedicines,
   getTodayMedicines,
 } from "../../api/medicineApi";
-import { checkDur } from "../../api/durApi";
 import type { Medicine } from "../../types/Medicine";
 import "../../styles/MyMedicine.css";
 import LoginRequiredCard from "../../components/LoginRequiredCard";
@@ -19,7 +18,6 @@ function MyMedicine() {
   const [checkingDur, setCheckingDur] = useState(false);
   const [cautionCount, setCautionCount] = useState(0);
   const [cautionDetails, setCautionDetails] = useState<string[]>([]);
-  const navigate = useNavigate();
   const [needLogin, setNeedLogin] = useState(false);
 
   const fetchMedicines = async () => {
@@ -34,8 +32,27 @@ function MyMedicine() {
       setMedicines(allData);
       setTodayMedicines(todayData);
 
-      await checkTodayDur(todayData);
-    } catch (error) {
+      setCheckingDur(true);
+
+      try {
+        const warningData = await getDurWarnings();
+
+        setCautionCount(warningData.length);
+
+        setCautionDetails(
+          warningData.map(
+            (warning) =>
+              `${warning.drug1Name} + ${warning.drug2Name}: ${warning.warningType} 주의`,
+          ),
+        );
+      } catch (warningError) {
+        console.error("DUR 캐시 조회 실패:", warningError);
+        setCautionCount(0);
+        setCautionDetails([]);
+      } finally {
+        setCheckingDur(false);
+      }
+    } catch (error: any) {
       if (error.response?.status === 401) {
         setNeedLogin(true);
         return;
@@ -44,65 +61,6 @@ function MyMedicine() {
       console.error(error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const checkTodayDur = async (todayData: Medicine[]) => {
-    setCheckingDur(true);
-
-    let count = 0;
-    const details: string[] = [];
-
-    try {
-      if (todayData.length < 2) {
-        setCautionCount(0);
-        setCautionDetails([]);
-        return;
-      }
-
-      for (let i = 0; i < todayData.length; i++) {
-        for (let j = i + 1; j < todayData.length; j++) {
-          try {
-            const result1 = await checkDur({
-              drug1: todayData[i].itemName,
-              drug2: todayData[j].itemName,
-            });
-
-            const result2 = await checkDur({
-              drug1: todayData[j].itemName,
-              drug2: todayData[i].itemName,
-            });
-
-            const dangerWarnings = [
-              ...result1.warnings,
-              ...result2.warnings,
-            ].filter(
-              (warning) =>
-                warning.danger &&
-                (warning.type === "병용금기" || warning.type === "효능군중복"),
-            );
-
-            if (dangerWarnings.length > 0) {
-              count++;
-
-              const types = Array.from(
-                new Set(dangerWarnings.map((warning) => warning.type)),
-              ).join(", ");
-
-              details.push(
-                `${todayData[i].itemName} + ${todayData[j].itemName}: ${types} 주의`,
-              );
-            }
-          } catch (error) {
-            console.error("DUR 체크 실패:", error);
-          }
-        }
-      }
-
-      setCautionCount(count);
-      setCautionDetails(details);
-    } finally {
-      setCheckingDur(false);
     }
   };
 
@@ -201,7 +159,7 @@ function MyMedicine() {
               </strong>
 
               {checkingDur ? (
-                <p>DUR 주의 정보를 계산하는 중입니다.</p>
+                <p>DUR 주의 정보를 불러오는 중입니다.</p>
               ) : cautionDetails.length === 0 ? (
                 <p>주의가 필요한 약 조합이 없습니다.</p>
               ) : (

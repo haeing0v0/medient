@@ -23,3 +23,15 @@ export interface MedicineRequest {
   status: string;
   memo: string;
 }
+
+export interface DurWarningCache {
+  id: number;
+  userId: number;
+  drug1Name: string;
+  drug2Name: string;
+  warningType: string;
+  message: string;
+  danger: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
