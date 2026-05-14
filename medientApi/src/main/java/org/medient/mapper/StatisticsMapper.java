@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.medient.dto.medicine.MedicineResponseDTO;
+import org.medient.dto.statistics.StatisticsResponseDTO;
 
 @Mapper
 public interface StatisticsMapper {
@@ -28,4 +29,8 @@ public interface StatisticsMapper {
     );
 
     List<MedicineResponseDTO> findActiveMedicines(@Param("userId") Long userId);
+    
+    List<StatisticsResponseDTO.TodayMedicineItem> findTodayMedicines(
+            @Param("userId") Long userId
+    );
 }

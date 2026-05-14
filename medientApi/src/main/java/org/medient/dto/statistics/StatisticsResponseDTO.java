@@ -18,6 +18,7 @@ public class StatisticsResponseDTO {
     private List<RateItem> monthlyGraph;
     private List<DangerItem> dangerItems;
     private List<CalendarItem> calendarItems;
+    private List<TodayMedicineItem> todayMedicines;
     private String feedback;
 
     @Getter
@@ -41,5 +42,14 @@ public class StatisticsResponseDTO {
     public static class CalendarItem {
         private String date;
         private boolean taken;
+    }
+    
+    @Getter
+    @Builder
+    public static class TodayMedicineItem {
+        private Long medicineId;
+        private String time;
+        private String itemName;
+        private String status;
     }
 }

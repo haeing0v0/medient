@@ -96,12 +96,14 @@ function Statistics() {
               <div className="bar-item" key={item.label}>
                 <div className="bar-wrap">
                   <div
-                    className="bar-fill"
-                    style={{ height: `${item.rate}%` }}
+                    className={item.rate === -1 ? "bar-fill empty" : "bar-fill"}
+                    style={{
+                      height: item.rate === -1 ? "8px" : `${item.rate}%`,
+                    }}
                   />
                 </div>
                 <span>{item.label}</span>
-                <small>{item.rate}%</small>
+                <small>{item.rate === -1 ? "-" : `${item.rate}%`}</small>
               </div>
             ))}
           </div>
@@ -114,9 +116,11 @@ function Statistics() {
               <div className="month-row" key={item.label}>
                 <span>{item.label}</span>
                 <div className="progress">
-                  <div style={{ width: `${item.rate}%` }} />
+                  <div
+                    style={{ width: item.rate === -1 ? "0%" : `${item.rate}%` }}
+                  />
                 </div>
-                <strong>{item.rate}%</strong>
+                <strong>{item.rate === -1 ? "-" : `${item.rate}%`}</strong>
               </div>
             ))}
           </div>

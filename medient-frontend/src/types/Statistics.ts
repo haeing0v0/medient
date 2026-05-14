@@ -15,6 +15,13 @@ export interface CalendarItem {
   taken: boolean;
 }
 
+export interface TodayMedicineItem {
+  medicineId: number;
+  time: string;
+  itemName: string;
+  status: string;
+}
+
 export interface StatisticsResponse {
   weeklyRate: number;
   monthlyRate: number;
@@ -24,5 +31,6 @@ export interface StatisticsResponse {
   monthlyGraph: RateItem[];
   dangerItems: DangerItem[];
   calendarItems: CalendarItem[];
+  todayMedicines: TodayMedicineItem[];
   feedback: string;
 }

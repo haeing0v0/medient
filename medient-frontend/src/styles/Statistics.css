@@ -1,7 +1,7 @@
 .stats-title {
   margin-bottom: 24px;
   font-size: 32px;
-  font-weight: 900;
+  font-weight: 800;
   color: #0f1f3d;
 }
 
@@ -123,6 +123,10 @@
   min-height: 8px;
   border-radius: 12px;
   background: #0b7fc3;
+}
+
+.bar-fill.empty {
+  background: #dbeaf0;
 }
 
 .bar-item span {

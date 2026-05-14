@@ -24,21 +24,14 @@ public class StatisticsService {
 
     public StatisticsResponseDTO getStatistics(Long userId) {
 
-        int weeklyRate = calculateRate(
-                statisticsMapper.countWeeklyTaken(userId),
-                statisticsMapper.countWeeklyTotal(userId)
-        );
+    	List<StatisticsResponseDTO.RateItem> weeklyGraph =
+    	        createWeeklyGraph(userId);
 
-        int monthlyRate = calculateRate(
-                statisticsMapper.countMonthlyTaken(userId),
-                statisticsMapper.countMonthlyTotal(userId)
-        );
+    	List<StatisticsResponseDTO.RateItem> monthlyGraph =
+    	        createMonthlyGraph(userId);
 
-        List<StatisticsResponseDTO.RateItem> weeklyGraph =
-                createWeeklyGraph(userId);
-
-        List<StatisticsResponseDTO.RateItem> monthlyGraph =
-                createMonthlyGraph(userId);
+    	int weeklyRate = calculateAverageRate(weeklyGraph);
+    	int monthlyRate = calculateAverageRate(monthlyGraph);
 
         List<StatisticsResponseDTO.CalendarItem> calendarItems =
                 createCalendarItems(userId);
@@ -51,6 +44,9 @@ public class StatisticsService {
         String feedback =
                 createFeedback(weeklyRate, streakDays, dangerItems.size());
 
+        List<StatisticsResponseDTO.TodayMedicineItem> todayMedicines =
+                statisticsMapper.findTodayMedicines(userId);
+
         return StatisticsResponseDTO.builder()
                 .weeklyRate(weeklyRate)
                 .monthlyRate(monthlyRate)
@@ -60,6 +56,7 @@ public class StatisticsService {
                 .monthlyGraph(monthlyGraph)
                 .dangerItems(dangerItems)
                 .calendarItems(calendarItems)
+                .todayMedicines(todayMedicines)
                 .feedback(feedback)
                 .build();
     }
@@ -70,6 +67,24 @@ public class StatisticsService {
         }
 
         return (int) Math.round((taken * 100.0) / total);
+    }
+    
+    private int calculateAverageRate(List<StatisticsResponseDTO.RateItem> graph) {
+        int sum = 0;
+        int count = 0;
+
+        for (StatisticsResponseDTO.RateItem item : graph) {
+            if (item.getRate() != -1) {
+                sum += item.getRate();
+                count++;
+            }
+        }
+
+        if (count == 0) {
+            return 0;
+        }
+
+        return (int) Math.round(sum * 1.0 / count);
     }
 
     private List<StatisticsResponseDTO.RateItem> createWeeklyGraph(Long userId) {
@@ -82,7 +97,7 @@ public class StatisticsService {
 
             int total = statisticsMapper.countTotalByDate(userId, date.toString());
             int taken = statisticsMapper.countTakenByDate(userId, date.toString());
-            int rate = calculateRate(taken, total);
+            int rate = total == 0 ? -1 : calculateRate(taken, total);
 
             String label = date.getDayOfWeek()
                     .getDisplayName(TextStyle.SHORT, Locale.KOREAN);
@@ -93,6 +108,11 @@ public class StatisticsService {
                             .rate(rate)
                             .build()
             );
+            
+            System.out.println(date);
+            System.out.println("전체 약: " + total);
+            System.out.println("복용 약: " + taken);
+            System.out.println("복용률: " + rate);
         }
 
         return list;
@@ -118,7 +138,7 @@ public class StatisticsService {
                 current = current.plusDays(1);
             }
 
-            int rate = calculateRate(taken, total);
+            int rate = total == 0 ? -1 : calculateRate(taken, total);
 
             list.add(
                     StatisticsResponseDTO.RateItem.builder()
@@ -177,6 +197,7 @@ public class StatisticsService {
 
     private List<StatisticsResponseDTO.DangerItem> createDangerItems(Long userId) {
         List<StatisticsResponseDTO.DangerItem> dangerItems = new ArrayList<>();
+        List<String> addedKeys = new ArrayList<>();
 
         List<MedicineResponseDTO> activeMedicines =
                 statisticsMapper.findActiveMedicines(userId);
@@ -198,9 +219,22 @@ public class StatisticsService {
                 warnings.addAll(result2.getWarnings());
 
                 for (DurWarningDTO warning : warnings) {
-                    if (warning.isDanger()
-                            && (warning.getType().equals("병용금기")
-                            || warning.getType().equals("효능군중복"))) {
+                    if (warning.isDanger()) {
+
+                        String key =
+                                drug1.getItemName()
+                                        + "|"
+                                        + drug2.getItemName()
+                                        + "|"
+                                        + warning.getType()
+                                        + "|"
+                                        + warning.getMessage();
+
+                        if (addedKeys.contains(key)) {
+                            continue;
+                        }
+
+                        addedKeys.add(key);
 
                         dangerItems.add(
                                 StatisticsResponseDTO.DangerItem.builder()
@@ -210,8 +244,6 @@ public class StatisticsService {
                                         .message(warning.getMessage())
                                         .build()
                         );
-
-                        break;
                     }
                 }
             }

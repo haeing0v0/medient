@@ -5,40 +5,63 @@
 
 <mapper namespace="org.medient.mapper.StatisticsMapper">
 
+    <!-- 최근 7일 동안 복용 예정이었던 약 개수 합계 -->
     <select id="countWeeklyTotal" resultType="int">
         SELECT COUNT(*)
-        FROM user_medicine
-        WHERE user_id = #{userId}
-          AND status != '중단'
-          AND start_date &lt;= CURDATE()
-          AND end_date >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+        FROM user_medicine um
+        JOIN (
+            SELECT CURDATE() AS target_date
+            UNION ALL SELECT DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+            UNION ALL SELECT DATE_SUB(CURDATE(), INTERVAL 2 DAY)
+            UNION ALL SELECT DATE_SUB(CURDATE(), INTERVAL 3 DAY)
+            UNION ALL SELECT DATE_SUB(CURDATE(), INTERVAL 4 DAY)
+            UNION ALL SELECT DATE_SUB(CURDATE(), INTERVAL 5 DAY)
+            UNION ALL SELECT DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+        ) d
+        WHERE um.user_id = #{userId}
+          AND um.status != '중단'
+          AND d.target_date BETWEEN um.start_date AND um.end_date
     </select>
 
+    <!-- 최근 7일 동안 복용 완료한 약 개수 -->
     <select id="countWeeklyTaken" resultType="int">
-        SELECT COUNT(DISTINCT medicine_id)
+        SELECT COUNT(DISTINCT medicine_id, taken_date)
         FROM medicine_log
         WHERE user_id = #{userId}
           AND taken_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 6 DAY) AND CURDATE()
           AND status = '복용완료'
     </select>
 
+    <!-- 최근 30일 동안 복용 예정이었던 약 개수 합계 -->
     <select id="countMonthlyTotal" resultType="int">
         SELECT COUNT(*)
-        FROM user_medicine
-        WHERE user_id = #{userId}
-          AND status != '중단'
-          AND start_date &lt;= CURDATE()
-          AND end_date >= DATE_SUB(CURDATE(), INTERVAL 29 DAY)
+        FROM user_medicine um
+        JOIN (
+            SELECT DATE_SUB(CURDATE(), INTERVAL n DAY) AS target_date
+            FROM (
+                SELECT 0 n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+                UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9
+                UNION ALL SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12 UNION ALL SELECT 13 UNION ALL SELECT 14
+                UNION ALL SELECT 15 UNION ALL SELECT 16 UNION ALL SELECT 17 UNION ALL SELECT 18 UNION ALL SELECT 19
+                UNION ALL SELECT 20 UNION ALL SELECT 21 UNION ALL SELECT 22 UNION ALL SELECT 23 UNION ALL SELECT 24
+                UNION ALL SELECT 25 UNION ALL SELECT 26 UNION ALL SELECT 27 UNION ALL SELECT 28 UNION ALL SELECT 29
+            ) nums
+        ) d
+        WHERE um.user_id = #{userId}
+          AND um.status != '중단'
+          AND d.target_date BETWEEN um.start_date AND um.end_date
     </select>
 
+    <!-- 최근 30일 동안 복용 완료한 약 개수 -->
     <select id="countMonthlyTaken" resultType="int">
-        SELECT COUNT(DISTINCT medicine_id)
+        SELECT COUNT(DISTINCT medicine_id, taken_date)
         FROM medicine_log
         WHERE user_id = #{userId}
           AND taken_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 29 DAY) AND CURDATE()
           AND status = '복용완료'
     </select>
 
+    <!-- 특정 날짜에 복용 예정인 약 개수 -->
     <select id="countTotalByDate" resultType="int">
         SELECT COUNT(*)
         FROM user_medicine
@@ -47,6 +70,7 @@
           AND #{date} BETWEEN start_date AND end_date
     </select>
 
+    <!-- 특정 날짜에 복용 완료한 약 개수 -->
     <select id="countTakenByDate" resultType="int">
         SELECT COUNT(DISTINCT medicine_id)
         FROM medicine_log
@@ -72,6 +96,28 @@
         WHERE user_id = #{userId}
           AND status != '중단'
           AND CURDATE() BETWEEN start_date AND end_date
+    </select>
+
+    <select id="findTodayMedicines"
+            resultType="org.medient.dto.statistics.StatisticsResponseDTO$TodayMedicineItem">
+        SELECT
+            um.id AS medicineId,
+            um.dose_time AS time,
+            um.item_name AS itemName,
+            CASE
+                WHEN ml.id IS NOT NULL THEN '완료'
+                ELSE '예정'
+            END AS status
+        FROM user_medicine um
+        LEFT JOIN medicine_log ml
+            ON um.id = ml.medicine_id
+            AND ml.user_id = #{userId}
+            AND ml.taken_date = CURDATE()
+            AND ml.status = '복용완료'
+        WHERE um.user_id = #{userId}
+          AND um.status != '중단'
+          AND CURDATE() BETWEEN um.start_date AND um.end_date
+        ORDER BY um.id DESC
     </select>
 
 </mapper>
