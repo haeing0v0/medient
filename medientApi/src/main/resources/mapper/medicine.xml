@@ -20,6 +20,7 @@
             DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt
         FROM user_medicine
         WHERE user_id = #{userId}
+  			AND status != '삭제됨'
         ORDER BY id DESC
     </select>
 
@@ -49,8 +50,9 @@
 	      ON um.id = ml.medicine_id
 	     AND um.user_id = ml.user_id
 	    WHERE um.user_id = #{userId}
-	      AND CURDATE() BETWEEN um.start_date AND um.end_date
-	      AND um.status != '중단'
+		  AND CURDATE() BETWEEN um.start_date AND um.end_date
+		  AND um.status != '중단'
+		  AND um.status != '삭제됨'
 	    ORDER BY um.id DESC
 	</select>
 
@@ -79,11 +81,12 @@
         )
     </insert>
 
-    <delete id="deleteMedicine">
-        DELETE FROM user_medicine
-        WHERE id = #{id}
-          AND user_id = #{userId}
-    </delete>
+    <update id="deleteMedicine">
+	    UPDATE user_medicine
+	    SET status = '삭제됨'
+	    WHERE id = #{id}
+	      AND user_id = #{userId}
+	</update>
     
     <select id="findById" resultType="org.medient.dto.medicine.MedicineResponseDTO">
     SELECT
@@ -149,8 +152,9 @@
 	        DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt
 	    FROM user_medicine
 	    WHERE user_id = #{userId}
-	      AND status != '중단'
-	      AND CURDATE() BETWEEN start_date AND end_date
+		  AND status != '중단'
+		  AND status != '삭제됨'
+		  AND CURDATE() BETWEEN start_date AND end_date
 	    ORDER BY id DESC
 	</select>
 </mapper>

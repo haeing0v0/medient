@@ -10,6 +10,8 @@ import {
 import type { Medicine } from "../../types/Medicine";
 import "../../styles/MyMedicine.css";
 import LoginRequiredCard from "../../components/LoginRequiredCard";
+import { getStatistics } from "../../api/statisticsApi";
+import type { StatisticsResponse } from "../../types/Statistics";
 
 function MyMedicine() {
   const [medicines, setMedicines] = useState<Medicine[]>([]);
@@ -19,20 +21,23 @@ function MyMedicine() {
   const [cautionCount, setCautionCount] = useState(0);
   const [cautionDetails, setCautionDetails] = useState<string[]>([]);
   const [needLogin, setNeedLogin] = useState(false);
+  const [stats, setStats] = useState<StatisticsResponse | null>(null);
 
   const fetchMedicines = async () => {
     try {
       setLoading(true);
 
-      const [allData, todayData] = await Promise.all([
+      const [allData, todayData, statsData] = await Promise.all([
         getMedicines(),
         getTodayMedicines(),
+        getStatistics(),
       ]);
 
       setMedicines(allData);
       setTodayMedicines(todayData);
 
       setCheckingDur(true);
+      setStats(statsData);
 
       try {
         const warningData = await getDurWarnings();
@@ -144,7 +149,7 @@ function MyMedicine() {
 
         <div>
           <span>오늘 복용</span>
-          <strong>{todayMedicines.length}회</strong>
+          <strong>{stats?.todayTakenCount ?? 0}회</strong>
         </div>
 
         <div>

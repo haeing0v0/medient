@@ -94,8 +94,9 @@
             DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt
         FROM user_medicine
         WHERE user_id = #{userId}
-          AND status != '중단'
-          AND CURDATE() BETWEEN start_date AND end_date
+		  AND status != '중단'
+		  AND status != '삭제됨'
+		  AND CURDATE() BETWEEN start_date AND end_date
     </select>
 
     <select id="findTodayMedicines"
@@ -115,9 +116,18 @@
             AND ml.taken_date = CURDATE()
             AND ml.status = '복용완료'
         WHERE um.user_id = #{userId}
-          AND um.status != '중단'
-          AND CURDATE() BETWEEN um.start_date AND um.end_date
+		  AND um.status != '중단'
+		  AND um.status != '삭제됨'
+		  AND CURDATE() BETWEEN um.start_date AND um.end_date
         ORDER BY um.id DESC
     </select>
+    
+    <select id="countTodayTaken" resultType="int">
+	    SELECT COUNT(DISTINCT medicine_id)
+	    FROM medicine_log
+	    WHERE user_id = #{userId}
+	      AND taken_date = CURDATE()
+	      AND status = '복용완료'
+	</select>
 
 </mapper>

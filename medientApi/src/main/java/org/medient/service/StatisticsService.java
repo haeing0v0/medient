@@ -45,6 +45,8 @@ public class StatisticsService {
 
         List<StatisticsResponseDTO.TodayMedicineItem> todayMedicines =
                 statisticsMapper.findTodayMedicines(userId);
+        
+        int todayTakenCount = statisticsMapper.countTodayTaken(userId);
 
         return StatisticsResponseDTO.builder()
                 .weeklyRate(weeklyRate)
@@ -56,6 +58,7 @@ public class StatisticsService {
                 .dangerItems(dangerItems)
                 .calendarItems(calendarItems)
                 .todayMedicines(todayMedicines)
+                .todayTakenCount(todayTakenCount)
                 .feedback(feedback)
                 .build();
     }
@@ -156,7 +159,7 @@ public class StatisticsService {
             int total = statisticsMapper.countTotalByDate(userId, date.toString());
             int taken = statisticsMapper.countTakenByDate(userId, date.toString());
 
-            boolean isTaken = total > 0 && taken >= total;
+            boolean isTaken = taken > 0;
 
             list.add(
                     StatisticsResponseDTO.CalendarItem.builder()

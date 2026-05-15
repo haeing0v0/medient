@@ -17,6 +17,8 @@ public interface StatisticsMapper {
     int countMonthlyTotal(@Param("userId") Long userId);
 
     int countMonthlyTaken(@Param("userId") Long userId);
+    
+    int countTodayTaken(@Param("userId") Long userId);
 
     int countTotalByDate(
             @Param("userId") Long userId,

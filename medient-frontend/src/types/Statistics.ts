@@ -32,5 +32,6 @@ export interface StatisticsResponse {
   dangerItems: DangerItem[];
   calendarItems: CalendarItem[];
   todayMedicines: TodayMedicineItem[];
+  todayTakenCount: number;
   feedback: string;
 }

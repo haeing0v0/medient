@@ -13,6 +13,7 @@ public class StatisticsResponseDTO {
     private int monthlyRate;
     private int streakDays;
     private int dangerCount;
+    private int todayTakenCount;
 
     private List<RateItem> weeklyGraph;
     private List<RateItem> monthlyGraph;
