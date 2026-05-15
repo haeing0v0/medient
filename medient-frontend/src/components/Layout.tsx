@@ -1,5 +1,6 @@
 import { NavLink, Outlet, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { getLoginUser, isTokenExpired, logoutUser } from "../utils/auth";
 import "../styles/Layout.css";
 
 interface LoginUser {
@@ -16,15 +17,26 @@ function Layout() {
   const [loginUser, setLoginUser] = useState<LoginUser | null>(null);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("loginUser");
+    const savedUser = getLoginUser();
 
-    if (savedUser) {
-      setLoginUser(JSON.parse(savedUser));
+    if (!savedUser) {
+      setLoginUser(null);
+      return;
     }
-  }, []);
+
+    if (isTokenExpired(savedUser.token)) {
+      logoutUser();
+      setLoginUser(null);
+      alert("로그인 시간이 만료되었습니다. 다시 로그인해주세요.");
+      navigate("/login");
+      return;
+    }
+
+    setLoginUser(savedUser);
+  }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem("loginUser");
+    logoutUser();
     setLoginUser(null);
     alert("로그아웃 되었습니다.");
     navigate("/");
