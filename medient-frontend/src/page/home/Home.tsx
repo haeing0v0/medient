@@ -1,24 +1,205 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getStatistics } from "../../api/statisticsApi";
+import type { StatisticsResponse } from "../../types/Statistics";
 import "../../styles/Home.css";
 
+interface LoginUser {
+  userNo: number;
+  userId: string;
+  userName: string;
+  age: number;
+  gender: string;
+  isPregnant: boolean;
+  token: string;
+}
+
 function Home() {
+  const [loginUser, setLoginUser] = useState<LoginUser | null>(null);
+  const [stats, setStats] = useState<StatisticsResponse | null>(null);
+  const [dashboardLoading, setDashboardLoading] = useState(false);
+
+  useEffect(() => {
+    const checkLoginAndFetchDashboard = () => {
+      const savedUser = localStorage.getItem("loginUser");
+
+      if (!savedUser) {
+        setLoginUser(null);
+        setStats(null);
+        return;
+      }
+
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        setLoginUser(parsedUser);
+
+        const fetchDashboard = async () => {
+          try {
+            setDashboardLoading(true);
+            const data = await getStatistics();
+            setStats(data);
+          } catch (error) {
+            console.error(error);
+          } finally {
+            setDashboardLoading(false);
+          }
+        };
+
+        fetchDashboard();
+      } catch {
+        localStorage.removeItem("loginUser");
+        setLoginUser(null);
+        setStats(null);
+      }
+    };
+
+    checkLoginAndFetchDashboard();
+
+    window.addEventListener("loginStateChange", checkLoginAndFetchDashboard);
+
+    return () => {
+      window.removeEventListener(
+        "loginStateChange",
+        checkLoginAndFetchDashboard,
+      );
+    };
+  }, []);
+
+  const todayMedicines = stats?.todayMedicines ?? [];
+  const todayTotal = todayMedicines.length;
+  const todayDone = todayMedicines.filter(
+    (item) => item.status === "완료" || item.status === "복용완료",
+  ).length;
+  const missedCount = Math.max(todayTotal - todayDone, 0);
+  const dangerCount = stats?.dangerCount ?? 0;
+  const weeklyRate = stats?.weeklyRate ?? 0;
+
   return (
     <div className="home-page">
-      <section className="hero">
-        <h1>내 약, 안전하게 관리하세요</h1>
+      {loginUser ? (
+        <section className="login-dashboard-card">
+          <div className="dashboard-header">
+            <div>
+              <span className="section-label green">MY DASHBOARD</span>
+              <h1>안녕하세요, {loginUser.userName}님 👋</h1>
+              <p>오늘 복용해야 할 약과 안전 알림을 확인하세요.</p>
+            </div>
 
-        <p>DUR 공공데이터 기반으로 병용금기와 맞춤 복약 위험을 확인하세요.</p>
+            <div className="dashboard-links">
+              <Link to="/my-medicine">내 복용약 관리</Link>
+              <Link to="/statistics">통계 보기</Link>
+            </div>
+          </div>
 
-        <div className="hero-buttons">
-          <Link to="/drugs" className="primary-btn">
-            🔍 약 검색하기
-          </Link>
+          {dashboardLoading ? (
+            <div className="dashboard-loading">대시보드를 불러오는 중...</div>
+          ) : (
+            <>
+              <div className="dashboard-stat-grid">
+                <div>
+                  <strong className="green-text">{todayTotal}건</strong>
+                  <span>오늘 복용 예정</span>
+                </div>
 
-          <Link to="/my-drugs" className="secondary-btn">
-            📋 내 복용약
-          </Link>
-        </div>
-      </section>
+                <div>
+                  <strong className="red-text">{missedCount}건</strong>
+                  <span>미복용</span>
+                </div>
+
+                <div>
+                  <strong className="orange-text">{dangerCount}건</strong>
+                  <span>위험 알림</span>
+                </div>
+
+                <div>
+                  <strong className="blue-text">{weeklyRate}%</strong>
+                  <span>이번 주 복용률</span>
+                </div>
+              </div>
+
+              <div className="dashboard-content-grid">
+                <div className="today-schedule-card">
+                  <h3>오늘 복용 일정</h3>
+
+                  {todayMedicines.length === 0 ? (
+                    <p className="empty-dashboard-text">
+                      오늘 복용할 약이 없습니다.
+                    </p>
+                  ) : (
+                    todayMedicines.slice(0, 4).map((item, index) => (
+                      <div className="schedule-row" key={index}>
+                        <b>{item.time || "복용시간"}</b>
+                        <span>{item.itemName}</span>
+                        <em
+                          className={
+                            item.status === "완료" || item.status === "복용완료"
+                              ? "green-text"
+                              : "orange-text"
+                          }
+                        >
+                          {item.status}
+                        </em>
+                      </div>
+                    ))
+                  )}
+
+                  <Link to="/my-medicine" className="small-link-btn">
+                    자세히 보기
+                  </Link>
+                </div>
+
+                <div
+                  className={
+                    dangerCount > 0
+                      ? "dashboard-warning-card"
+                      : "dashboard-warning-card safe"
+                  }
+                >
+                  <h3>DUR 위험 알림</h3>
+
+                  {dangerCount > 0 ? (
+                    <>
+                      <strong>병용금기 {dangerCount}건 발견</strong>
+                      <p>
+                        등록된 복용약 조합 중 주의가 필요한 항목이 있습니다.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <strong className="safe-dashboard-title">
+                        주의 알림 없음
+                      </strong>
+                      <p>
+                        현재 등록된 복용약 조합에서 주요 위험 알림이 없습니다.
+                      </p>
+                    </>
+                  )}
+
+                  <Link to="/statistics" className="warning-link-btn">
+                    자세히 보기
+                  </Link>
+                </div>
+              </div>
+            </>
+          )}
+        </section>
+      ) : (
+        <section className="hero">
+          <h1>내 약, 안전하게 관리하세요</h1>
+
+          <p>DUR 공공데이터 기반으로 병용금기와 맞춤 복약 위험을 확인하세요.</p>
+
+          <div className="hero-buttons">
+            <Link to="/drugs" className="primary-btn">
+              🔍 약 검색하기
+            </Link>
+
+            <Link to="/my-medicine" className="secondary-btn">
+              📋 내 복용약
+            </Link>
+          </div>
+        </section>
+      )}
 
       <section className="intro-section">
         <span className="section-label green">WHY MEDIENT?</span>
@@ -56,8 +237,8 @@ function Home() {
         <span className="section-label blue-label">SERVICE FLOW</span>
         <h2>검색부터 안전체크, 복용 통계까지 한 흐름으로</h2>
         <p>
-          비회원은 약 검색과 단일 안전 체크를 사용할 수 있고, 회원은 내 복용약
-          기반 자동 분석과 복용 통계를 확인할 수 있습니다.
+          비회원은 약 검색과 안전체크를 사용할 수 있고, 회원은 내 복용약 기반
+          자동 분석과 복용 통계를 확인할 수 있습니다.
         </p>
 
         <div className="flow-list">
@@ -101,72 +282,67 @@ function Home() {
         </div>
       </section>
 
-      <section className="dashboard-section">
-        <span className="section-label green">LOGIN DASHBOARD PREVIEW</span>
-        <h2>로그인하면 이런 대시보드가 보여요</h2>
-        <p>
-          내 복용약, 오늘의 복용 일정, DUR 위험 알림, 복용률을 한 화면에서
-          확인할 수 있습니다.
-        </p>
+      {!loginUser && (
+        <section className="dashboard-section">
+          <span className="section-label green">LOGIN DASHBOARD PREVIEW</span>
+          <h2>로그인하면 이런 대시보드가 보여요</h2>
+          <p>
+            내 복용약, 오늘의 복용 일정, DUR 위험 알림, 복용률을 한 화면에서
+            확인할 수 있습니다.
+          </p>
 
-        <div className="dashboard-preview">
-          <aside className="preview-sidebar">
-            <h3>💊 Medient</h3>
-            <button>대시보드</button>
-            <span>내 복용약</span>
-            <span>안전체크</span>
-            <span>통계</span>
-            <span>설정</span>
-          </aside>
+          <div className="dashboard-preview">
+            <div className="preview-main">
+              <h3>안녕하세요, 사용자님 👋</h3>
+              <p>오늘 복용해야 할 약과 안전 알림을 확인하세요.</p>
 
-          <div className="preview-main">
-            <h3>안녕하세요, 신나는 호랑이님 👋</h3>
-            <p>오늘 복용해야 할 약과 안전 알림을 확인하세요.</p>
-
-            <div className="stat-grid">
-              <div>
-                <strong className="green-text">3건</strong>
-                <span>복용 예정</span>
-              </div>
-              <div>
-                <strong className="red-text">1건</strong>
-                <span>놓친 약</span>
-              </div>
-              <div>
-                <strong className="orange-text">1건</strong>
-                <span>위험 알림</span>
-              </div>
-              <div>
-                <strong className="blue-text">86%</strong>
-                <span>복용률</span>
-              </div>
-            </div>
-
-            <div className="preview-bottom">
-              <div className="schedule-box">
-                <h4>오늘 복용 일정</h4>
-                <p>
-                  <b>08:00</b> 혈압약 A <span className="green-text">완료</span>
-                </p>
-                <p>
-                  <b>13:00</b> 비타민 D <span className="green-text">예정</span>
-                </p>
-                <p>
-                  <b>21:00</b> 타이레놀정{" "}
-                  <span className="orange-text">주의</span>
-                </p>
+              <div className="stat-grid">
+                <div>
+                  <strong className="green-text">3건</strong>
+                  <span>복용 예정</span>
+                </div>
+                <div>
+                  <strong className="red-text">1건</strong>
+                  <span>놓친 약</span>
+                </div>
+                <div>
+                  <strong className="orange-text">1건</strong>
+                  <span>위험 알림</span>
+                </div>
+                <div>
+                  <strong className="blue-text">86%</strong>
+                  <span>복용률</span>
+                </div>
               </div>
 
-              <div className="warning-box">
-                <h4>DUR 위험 알림!</h4>
-                <strong>병용금기 1건 발견</strong>
-                <p>등록된 복용약 조합 중 주의가 필요한 항목이 있습니다.</p>
-                <button>자세히 확인</button>
+              <div className="preview-bottom">
+                <div className="schedule-box">
+                  <h4>오늘 복용 일정</h4>
+                  <p>
+                    <b>08:00</b> 혈압약 A{" "}
+                    <span className="green-text">완료</span>
+                  </p>
+                  <p>
+                    <b>13:00</b> 비타민 D{" "}
+                    <span className="green-text">예정</span>
+                  </p>
+                  <p>
+                    <b>21:00</b> 타이레놀정{" "}
+                    <span className="orange-text">주의</span>
+                  </p>
+                </div>
+
+                <div className="warning-box">
+                  <h4>DUR 위험 알림!</h4>
+                  <strong>병용금기 1건 발견</strong>
+                  <p>등록된 복용약 조합 중 주의가 필요한 항목이 있습니다.</p>
+                  <button>자세히 확인</button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <section className="core-section">
         <span className="section-label blue-label">CORE FEATURES</span>
@@ -198,10 +374,10 @@ function Home() {
           </div>
 
           <div className="core-card">
-            <span>⚖️</span>
+            <span>💊</span>
             <div>
-              <h3>약 비교</h3>
-              <p>두 약의 성분과 주의사항을 나란히 비교</p>
+              <h3>복용약 관리</h3>
+              <p>복용 중인 약과 복용 기록을 한눈에 관리</p>
             </div>
           </div>
 

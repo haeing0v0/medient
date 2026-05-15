@@ -59,9 +59,13 @@ public class MedicineService {
     }
 
     public void deleteMedicine(Long id, Long userId) {
+        MedicineResponseDTO medicine = medicineMapper.findById(id, userId);
+
         medicineMapper.deleteMedicine(id, userId);
 
-        refreshDurCache(userId);
+        if (medicine != null) {
+            durCacheMapper.deleteByDrugName(userId, medicine.getItemName());
+        }
     }
 
     private void refreshDurCache(Long userId) {

@@ -81,7 +81,14 @@ function MyMedicine() {
 
     try {
       await deleteMedicine(id);
+
+      setMedicines((prev) => prev.filter((medicine) => medicine.id !== id));
+      setTodayMedicines((prev) =>
+        prev.filter((medicine) => medicine.id !== id),
+      );
+
       alert("복용약이 삭제되었습니다.");
+
       fetchMedicines();
     } catch (error) {
       console.error(error);

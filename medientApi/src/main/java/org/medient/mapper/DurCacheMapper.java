@@ -14,4 +14,9 @@ public interface DurCacheMapper {
     void insertCache(DurCacheDTO dto);
 
     List<DurCacheDTO> findByUserId(@Param("userId") Long userId);
+    
+    void deleteByDrugName(
+            @Param("userId") Long userId,
+            @Param("drugName") String drugName
+    );
 }

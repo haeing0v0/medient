@@ -48,5 +48,11 @@
         WHERE user_id = #{userId}
         ORDER BY updated_at DESC
     </select>
+    
+    <delete id="deleteByDrugName">
+	    DELETE FROM dur_check_cache
+	    WHERE user_id = #{userId}
+	      AND (drug1_name = #{drugName} OR drug2_name = #{drugName})
+	</delete>
 
 </mapper>
