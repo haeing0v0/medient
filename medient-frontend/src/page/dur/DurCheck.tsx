@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { checkDur } from "../../api/durApi";
 import { searchDrugs } from "../../api/drugApi";
 import type { DurCheckResponse } from "../../api/durApi";
@@ -6,6 +7,8 @@ import type { DrugSearchResponse } from "../../types/Drug";
 import "../../styles/DurCheck.css";
 
 function DurCheck() {
+  const [searchParams] = useSearchParams();
+
   const [drug1, setDrug1] = useState("");
   const [drug2, setDrug2] = useState("");
   const [result, setResult] = useState<DurCheckResponse | null>(null);
@@ -17,6 +20,15 @@ function DurCheck() {
   const [drug2Suggestions, setDrug2Suggestions] = useState<
     DrugSearchResponse[]
   >([]);
+
+  useEffect(() => {
+    const queryDrug1 = searchParams.get("drug1");
+
+    if (queryDrug1) {
+      setDrug1(queryDrug1);
+      setResult(null);
+    }
+  }, [searchParams]);
 
   const handleDrug1Change = async (value: string) => {
     setDrug1(value);

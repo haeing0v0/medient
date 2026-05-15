@@ -71,16 +71,15 @@
 }
 
 .bottom-actions {
-  width: 66%;
+  width: 54%;
   margin: 18px auto 10px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 28px;
 }
 
 .register-btn,
-.dur-btn,
-.compare-btn {
+.dur-btn {
   height: 36px;
   border-radius: 999px;
   font-size: 13px;
@@ -98,12 +97,6 @@
   border: none;
   background: #0878bd;
   color: white;
-}
-
-.compare-btn {
-  border: 1px solid #cfd7df;
-  background: white;
-  color: #24477c;
 }
 
 .notice-text {

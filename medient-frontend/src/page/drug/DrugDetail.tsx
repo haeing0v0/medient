@@ -30,6 +30,43 @@ function DrugDetail() {
     fetchDetail();
   }, [itemSeq]);
 
+  const isLogin = () => {
+    const loginUser = localStorage.getItem("loginUser");
+
+    if (!loginUser) {
+      return false;
+    }
+
+    try {
+      const parsedUser = JSON.parse(loginUser);
+      return Boolean(parsedUser.token);
+    } catch {
+      return false;
+    }
+  };
+
+  const handleRegisterMedicine = () => {
+    if (!drug) return;
+
+    if (!isLogin()) {
+      alert("로그인 후 이용할 수 있습니다.");
+      navigate("/login");
+      return;
+    }
+
+    navigate(
+      `/my-medicine/add?itemName=${encodeURIComponent(
+        drug.itemName,
+      )}&itemSeq=${encodeURIComponent(itemSeq ?? "")}`,
+    );
+  };
+
+  const handleDurCheck = () => {
+    if (!drug) return;
+
+    navigate(`/dur-check?drug1=${encodeURIComponent(drug.itemName)}`);
+  };
+
   if (loading) {
     return <p className="detail-message">상세 정보를 불러오는 중입니다...</p>;
   }
@@ -87,10 +124,14 @@ function DrugDetail() {
         </div>
       </section>
 
-      <div className="bottom-actions">
-        <button className="register-btn">내 복용약 등록</button>
-        <button className="dur-btn">DUR 단일 체크</button>
-        <button className="compare-btn">약 비교하기</button>
+      <div className="bottom-actions two-buttons">
+        <button className="register-btn" onClick={handleRegisterMedicine}>
+          내 복용약 등록
+        </button>
+
+        <button className="dur-btn" onClick={handleDurCheck}>
+          DUR 체크하기
+        </button>
       </div>
 
       <p className="notice-text">

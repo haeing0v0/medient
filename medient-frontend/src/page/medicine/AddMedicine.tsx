@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   addMedicine,
   getMedicine,
@@ -12,6 +12,8 @@ import "../../styles/AddMedicine.css";
 function AddMedicine() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+
   const isEdit = Boolean(id);
 
   const [itemName, setItemName] = useState("");
@@ -45,8 +47,22 @@ function AddMedicine() {
   };
 
   useEffect(() => {
-    fetchMedicine();
-  }, [id]);
+    if (isEdit) {
+      fetchMedicine();
+      return;
+    }
+
+    const queryItemName = searchParams.get("itemName");
+    const queryItemSeq = searchParams.get("itemSeq");
+
+    if (queryItemName) {
+      setItemName(queryItemName);
+    }
+
+    if (queryItemSeq) {
+      setItemSeq(queryItemSeq);
+    }
+  }, [id, isEdit, searchParams]);
 
   const handleDrugChange = async (value: string) => {
     setItemName(value);
