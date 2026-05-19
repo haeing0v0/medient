@@ -123,16 +123,10 @@
 	
 	<insert id="insertMedicineLog">
 	    INSERT INTO medicine_log (
-	        user_id,
-	        medicine_id,
-	        taken_date,
-	        status
+	        user_id, medicine_id, taken_date, status
 	    )
 	    VALUES (
-	        #{userId},
-	        #{id},
-	        CURDATE(),
-	        '복용완료'
+	        #{userId}, #{id}, CURDATE(), '복용완료'
 	    )
 	</insert>
 	
