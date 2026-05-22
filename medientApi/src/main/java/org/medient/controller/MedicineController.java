@@ -25,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/medicines")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173")
 public class MedicineController {
 
     private final MedicineService medicineService;
