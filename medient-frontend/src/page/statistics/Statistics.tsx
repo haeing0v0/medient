@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { getStatistics } from "../../api/statisticsApi";
 import type { StatisticsResponse } from "../../types/Statistics";
 import "../../styles/Statistics.css";
